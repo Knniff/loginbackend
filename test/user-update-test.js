@@ -2,12 +2,12 @@ require("dotenv").config();
 const request = require("supertest");
 const app = require("../server");
 
-describe("PUT /users/", function() {
-  var adminToken = null;
-  var userToken = null;
-  var adminId = null;
-  var userId = null;
-  beforeEach(async function() {
+describe("PUT /users/", function () {
+  let adminToken = null;
+  let userToken = null;
+  let adminId = null;
+  let userId = null;
+  beforeEach(async function () {
     const user = {
       username: "User",
       password: "123456789",
@@ -17,16 +17,16 @@ describe("PUT /users/", function() {
       password: "123456789",
     };
     await request(app)
-      .post("/users/authenticate")
+      .post("/users/login")
       .send(admin)
-      .then(response => {
+      .then((response) => {
         adminToken = response.body.token;
         adminId = response.body._id;
       });
     await request(app)
-      .post("/users/authenticate")
+      .post("/users/login")
       .send(user)
-      .then(response => {
+      .then((response) => {
         userToken = response.body.token;
         userId = response.body._id;
       });
@@ -38,7 +38,7 @@ describe("PUT /users/", function() {
    *   statusCode: 200
    *
    */
-  it("respond with 200 ok, because of correct input and unique username", function(done) {
+  it("respond with 200 ok, because of correct input and unique username", function (done) {
     const user = {
       username: "User1",
       password: "123456789",
@@ -46,8 +46,8 @@ describe("PUT /users/", function() {
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(user)
       .expect(200, done);
   });
@@ -57,7 +57,7 @@ describe("PUT /users/", function() {
    *   statusCode: 200
    *
    */
-  it("respond with 200 ok, because of correct input and the same username", function(done) {
+  it("respond with 200 ok, because of correct input and the same username", function (done) {
     const user = {
       username: "User",
       password: "123456789",
@@ -65,8 +65,8 @@ describe("PUT /users/", function() {
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(user)
       .expect(200, done);
   });
@@ -76,7 +76,7 @@ describe("PUT /users/", function() {
    *   statusCode:
    *
    */
-  it("respond with 500 forbidden, because the username already exists", function(done) {
+  it("respond with 500 forbidden, because the username already exists", function (done) {
     const user = {
       username: "Admin",
       password: "123456789",
@@ -84,8 +84,8 @@ describe("PUT /users/", function() {
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(user)
       .expect(
         500,
@@ -102,7 +102,7 @@ describe("PUT /users/", function() {
    *   statusCode:
    *
    */
-  it("respond with 403 forbidden, because a standard user cant update other users", function(done) {
+  it("respond with 403 forbidden, because a standard user cant update other users", function (done) {
     const user = {
       username: "Admin",
       password: "123456789",
@@ -110,8 +110,8 @@ describe("PUT /users/", function() {
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + adminId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${adminId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(user)
       .expect(
         403,
@@ -129,7 +129,7 @@ describe("PUT /users/", function() {
    *   statusCode: 200
    *
    */
-  it("respond with 200 ok, because of correct input and the same username and admin can update all", function(done) {
+  it("respond with 200 ok, because of correct input and the same username and admin can update all", function (done) {
     const user = {
       username: "User",
       password: "123456789",
@@ -137,8 +137,8 @@ describe("PUT /users/", function() {
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + adminToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${adminToken}`)
       .send(user)
       .expect(200, done);
   });
@@ -166,10 +166,10 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of no input", function(done) {
+  it("respond with 422 malformed, because of no input", function (done) {
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(
         422,
         {
@@ -211,16 +211,16 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of too short password", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of too short password", function (done) {
+    const data = {
       username: "CreationTest",
       password: "1234",
       firstName: "Max",
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,
@@ -242,8 +242,8 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of too long password", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of too long password", function (done) {
+    const data = {
       username: "CreationTest",
       password:
         "1234567891561f89e6w1f896we1f98we61f9856we1f89w1e569f189we1f896w5e18fw1e6584f",
@@ -251,8 +251,8 @@ describe("PUT /users/", function() {
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,
@@ -274,16 +274,16 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of a missing password", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of a missing password", function (done) {
+    const data = {
       username: "CreationTest",
       password: "",
       firstName: "Max",
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,
@@ -305,8 +305,8 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of too long username", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of too long username", function (done) {
+    const data = {
       username:
         "CreationTestvger4g89561er6584g98aerg1g1aer65g1ae91ga85e9r6w",
       password: "123456789",
@@ -314,8 +314,8 @@ describe("PUT /users/", function() {
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,
@@ -336,16 +336,16 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing username", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of missing username", function (done) {
+    const data = {
       username: "",
       password: "123456789",
       firstName: "Max",
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,
@@ -366,8 +366,8 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of too long firstName", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of too long firstName", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName:
@@ -375,8 +375,8 @@ describe("PUT /users/", function() {
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,
@@ -397,16 +397,16 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing firstName", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of missing firstName", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName: "",
       lastName: "Mustermann",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,
@@ -427,8 +427,8 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing lastName", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of missing lastName", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName: "Max",
@@ -436,8 +436,8 @@ describe("PUT /users/", function() {
         "Mustermanngre1869g51er68sag16era81g6a1er86g1ae8r6g186eraw4g18ae6rg1ae6r8g1ae86",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,
@@ -458,16 +458,16 @@ describe("PUT /users/", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing lastName", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of missing lastName", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName: "Max",
       lastName: "",
     };
     request(app)
-      .put("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .put(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .send(data)
       .expect(
         422,

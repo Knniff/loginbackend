@@ -2,15 +2,15 @@ require("dotenv").config();
 const request = require("supertest");
 const app = require("../server");
 
-describe("POST /users/register", function() {
+describe("POST /users/register", function () {
   /*
    *
    *   Testing: Correct Input
    *   statusCode: 200
    *
    */
-  it("respond with 200 ok, because of correct input", function(done) {
-    let data = {
+  it("respond with 200 ok, because of correct input", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName: "Max",
@@ -27,24 +27,21 @@ describe("POST /users/register", function() {
    *   statusCode: 500
    *
    */
-  it("respond with 500 internal server error, because of already existing username", function(done) {
-    let data = {
+  it("respond with 500 internal server error, because of already existing username", function (done) {
+    const data = {
       username: "User",
       password: "123456789",
       firstName: "Max",
       lastName: "Mustermann",
     };
-    request(app)
-      .post("/users/register")
-      .send(data)
-      .expect(
-        500,
-        {
-          Error: "Not Unique",
-          message: "Username User is already taken",
-        },
-        done,
-      );
+    request(app).post("/users/register").send(data).expect(
+      500,
+      {
+        Error: "Not Unique",
+        message: "Username User is already taken",
+      },
+      done,
+    );
   });
   /*
    *
@@ -52,7 +49,7 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of no input", function(done) {
+  it("respond with 422 malformed, because of no input", function (done) {
     request(app)
       .post("/users/register")
       .expect(
@@ -96,8 +93,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of too short password", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of too short password", function (done) {
+    const data = {
       username: "CreationTest",
       password: "1234",
       firstName: "Max",
@@ -126,8 +123,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of too long password", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of too long password", function (done) {
+    const data = {
       username: "CreationTest",
       password:
         "1234567891561f89e6w1f896we1f98we61f9856we1f89w1e569f189we1f896w5e18fw1e6584f",
@@ -157,8 +154,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of a missing password", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of a missing password", function (done) {
+    const data = {
       username: "CreationTest",
       password: "",
       firstName: "Max",
@@ -187,8 +184,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of too long username", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of too long username", function (done) {
+    const data = {
       username:
         "CreationTestvger4g89561er6584g98aerg1g1aer65g1ae91ga85e9r6w",
       password: "123456789",
@@ -217,8 +214,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing username", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of missing username", function (done) {
+    const data = {
       username: "",
       password: "123456789",
       firstName: "Max",
@@ -246,8 +243,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of too long firstName", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of too long firstName", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName:
@@ -276,8 +273,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing firstName", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of missing firstName", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName: "",
@@ -305,8 +302,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing lastName", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of missing lastName", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName: "Max",
@@ -335,8 +332,8 @@ describe("POST /users/register", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing lastName", function(done) {
-    let data = {
+  it("respond with 422 malformed, because of missing lastName", function (done) {
+    const data = {
       username: "CreationTest",
       password: "123456789",
       firstName: "Max",

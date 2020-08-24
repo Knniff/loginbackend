@@ -1,10 +1,11 @@
 require("dotenv").config();
-const request = require("supertest");
-const app = require("../server");
+// const request = require("supertest");
+// const app = require("../server");
 const dropDB = require("../_helpers/db").dropDB;
 const userService = require("../users/user.service");
+const Role = require("../_helpers/role");
 
-beforeEach(async function() {
+beforeEach(async function () {
   const user = {
     username: "User",
     password: "123456789",
@@ -16,13 +17,13 @@ beforeEach(async function() {
     password: "123456789",
     firstName: "Maxim",
     lastName: "Markow",
-    role: "Admin",
+    role: JSON.stringify(Role.Admin),
   };
   await dropDB();
-  await userService.create(user).catch(err => console.log(err));
-  await userService.create(admin).catch(err => console.log(err));
+  await userService.create(user).catch((err) => console.log(err));
+  await userService.create(admin).catch((err) => console.log(err));
 });
 
-after(async function() {
+after(async function () {
   await dropDB();
 });

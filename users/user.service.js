@@ -1,12 +1,13 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const db = require("../_helpers/db");
+const Role = require("../_helpers/role");
 const ErrorHelper = require("../_helpers/error-helper");
 
 const { User } = db;
 
 // eslint-disable-next-line consistent-return
-async function authenticate({ username, password }) {
+async function login({ username, password }) {
   const user = await User.findOne({ username });
   if (user && bcrypt.compareSync(password, user.hash)) {
     const token = jwt.sign(
@@ -43,7 +44,7 @@ async function create(userParam) {
   const user = new User(userParam);
   // hash password
   if (!("role" in userParam)) {
-    user.role = "User";
+    user.role = JSON.stringify(Role.User);
   }
   if (userParam.password) {
     user.hash = bcrypt.hashSync(userParam.password, 10);
@@ -83,7 +84,7 @@ async function deleter(id) {
 }
 
 module.exports = {
-  authenticate,
+  login,
   getAll,
   getById,
   create,

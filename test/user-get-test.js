@@ -2,10 +2,10 @@ require("dotenv").config();
 const request = require("supertest");
 const app = require("../server");
 
-describe("GET /users", function() {
-  var adminToken = null;
-  var userToken = null;
-  beforeEach(async function() {
+describe("GET /users", function () {
+  let adminToken = null;
+  let userToken = null;
+  beforeEach(async function () {
     const user = {
       username: "User",
       password: "123456789",
@@ -15,15 +15,15 @@ describe("GET /users", function() {
       password: "123456789",
     };
     await request(app)
-      .post("/users/authenticate")
+      .post("/users/login")
       .send(admin)
-      .then(response => {
+      .then((response) => {
         adminToken = response.body.token;
       });
     await request(app)
-      .post("/users/authenticate")
+      .post("/users/login")
       .send(user)
-      .then(response => {
+      .then((response) => {
         userToken = response.body.token;
       });
   });
@@ -34,10 +34,10 @@ describe("GET /users", function() {
    *   statusCode: 200
    *
    */
-  it("respond with 200 ok, because of correct token and role", function(done) {
+  it("respond with 200 ok, because of correct token and role", function (done) {
     request(app)
       .get("/users")
-      .set("Authorization", "Bearer " + adminToken)
+      .set("Authorization", `Bearer ${adminToken}`)
       .expect(200, done);
   });
   /*
@@ -46,10 +46,10 @@ describe("GET /users", function() {
    *   statusCode: 401
    *
    */
-  it("respond with 401 unauthorized, because of correct token but wrong role", function(done) {
+  it("respond with 401 unauthorized, because of correct token but wrong role", function (done) {
     request(app)
       .get("/users")
-      .set("Authorization", "Bearer " + userToken)
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(
         401,
         {
@@ -66,7 +66,7 @@ describe("GET /users", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 unauthorized, because of missing token", function(done) {
+  it("respond with 422 unauthorized, because of missing token", function (done) {
     request(app)
       .get("/users")
       .expect(
@@ -94,7 +94,7 @@ describe("GET /users", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 unauthorized, because of Bearer ", function(done) {
+  it("respond with 422 unauthorized, because of Bearer ", function (done) {
     request(app)
       .get("/users")
       .set("Authorization", "Bearer ")
@@ -117,7 +117,7 @@ describe("GET /users", function() {
    *   statusCode: 422
    *
    */
-  it("respond with 422 unauthorized, because of malformed token", function(done) {
+  it("respond with 422 unauthorized, because of malformed token", function (done) {
     request(app)
       .get("/users")
       .set(

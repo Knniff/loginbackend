@@ -2,12 +2,12 @@ require("dotenv").config();
 const request = require("supertest");
 const app = require("../server");
 
-describe("PUT /users/", function() {
-  var adminToken = null;
-  var userToken = null;
-  var adminId = null;
-  var userId = null;
-  beforeEach(async function() {
+describe("DELETE /users/", function () {
+  let adminToken = null;
+  let userToken = null;
+  let adminId = null;
+  let userId = null;
+  beforeEach(async function () {
     const user = {
       username: "User",
       password: "123456789",
@@ -17,16 +17,16 @@ describe("PUT /users/", function() {
       password: "123456789",
     };
     await request(app)
-      .post("/users/authenticate")
+      .post("/users/login")
       .send(admin)
-      .then(response => {
+      .then((response) => {
         adminToken = response.body.token;
         adminId = response.body._id;
       });
     await request(app)
-      .post("/users/authenticate")
+      .post("/users/login")
       .send(user)
-      .then(response => {
+      .then((response) => {
         userToken = response.body.token;
         userId = response.body._id;
       });
@@ -38,10 +38,10 @@ describe("PUT /users/", function() {
    *   statusCode: 200
    *
    */
-  it("respond with 200 ok, because he is allowed to delete himself", function(done) {
+  it("respond with 200 ok, because he is allowed to delete himself", function (done) {
     request(app)
-      .delete("/users/" + userId)
-      .set("Authorization", "Bearer " + userToken)
+      .delete(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(200, done);
   });
   /*
@@ -51,10 +51,10 @@ describe("PUT /users/", function() {
    *
    *
    */
-  it("respond with 403 forbidden, because a standard user cant delete other users", function(done) {
+  it("respond with 403 forbidden, because a standard user cant delete other users", function (done) {
     request(app)
-      .delete("/users/" + adminId)
-      .set("Authorization", "Bearer " + userToken)
+      .delete(`/users/${adminId}`)
+      .set("Authorization", `Bearer ${userToken}`)
       .expect(
         403,
         {
@@ -71,10 +71,10 @@ describe("PUT /users/", function() {
    *   statusCode: 200
    *
    */
-  it("respond with 200 ok, because admins are allowed to delete all users", function(done) {
+  it("respond with 200 ok, because admins are allowed to delete all users", function (done) {
     request(app)
-      .delete("/users/" + userId)
-      .set("Authorization", "Bearer " + adminToken)
+      .delete(`/users/${userId}`)
+      .set("Authorization", `Bearer ${adminToken}`)
       .expect(200, done);
   });
 });
