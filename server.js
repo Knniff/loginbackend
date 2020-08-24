@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -6,8 +7,8 @@ const errorHandler = require("./_helpers/error-handler");
 const log = require("./_helpers/logger");
 
 const app = express();
-//activates debug statements for troubleshooting
-//app.use(log.expressLogger);
+// activates debug statements for troubleshooting
+// app.use(log.expressLogger);
 app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
