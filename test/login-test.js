@@ -11,6 +11,21 @@ describe("POST /users/login", function () {
     request(app).post("/users/login").send(data).expect(200, done);
   });
 
+  it("respond with 401 Unauthorized, because of wrong password", function (done) {
+    let data = {
+      username: "User",
+      password: "1234563249",
+    };
+    request(app).post("/users/login").send(data).expect(
+      401,
+      {
+        Error: "Unauthorized",
+        message: "Username or Password is incorrect.",
+      },
+      done,
+    );
+  });
+
   it("respond with 422 malformed, because of no input", function (done) {
     request(app)
       .post("/users/login")
