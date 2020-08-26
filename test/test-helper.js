@@ -1,7 +1,7 @@
-require("dotenv").config();
+// require("dotenv").config();
 // const request = require("supertest");
 // const app = require("../server");
-const dropDB = require("../_helpers/db").dropDB;
+const { dropDB } = require("../_helpers/db");
 const userService = require("../users/user.service");
 const Role = require("../_helpers/role");
 

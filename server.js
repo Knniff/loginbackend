@@ -4,7 +4,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
 const errorHandler = require("./_helpers/error-handler");
-const log = require("./_helpers/logger");
+// const log = require("./_helpers/logger");
 
 const app = express();
 // activates debug statements for troubleshooting

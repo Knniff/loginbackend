@@ -1,4 +1,4 @@
-require("dotenv").config();
+// require("dotenv").config();
 const request = require("supertest");
 const app = require("../server");
 
@@ -20,14 +20,14 @@ describe("DELETE /users/", function () {
       .post("/users/login")
       .send(admin)
       .then((response) => {
-        adminToken = response.body.token;
+        adminToken = response.body.accessToken;
         adminId = response.body._id;
       });
     await request(app)
       .post("/users/login")
       .send(user)
       .then((response) => {
-        userToken = response.body.token;
+        userToken = response.body.accessToken;
         userId = response.body._id;
       });
   });
@@ -46,7 +46,7 @@ describe("DELETE /users/", function () {
   });
   /*
    *
-   *   Testing: user updating another user
+   *   Testing: user deleting another user
    *   statusCode: 403
    *
    *
@@ -67,7 +67,7 @@ describe("DELETE /users/", function () {
   });
   /*
    *
-   *   Testing: admin updating users firstname
+   *   Testing: admin deleting another users
    *   statusCode: 200
    *
    */

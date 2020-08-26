@@ -1,4 +1,4 @@
-require("dotenv").config();
+// require("dotenv").config();
 const request = require("supertest");
 const app = require("../server");
 
@@ -20,14 +20,14 @@ describe("PUT /users/", function () {
       .post("/users/login")
       .send(admin)
       .then((response) => {
-        adminToken = response.body.token;
+        adminToken = response.body.accessToken;
         adminId = response.body._id;
       });
     await request(app)
       .post("/users/login")
       .send(user)
       .then((response) => {
-        userToken = response.body.token;
+        userToken = response.body.accessToken;
         userId = response.body._id;
       });
   });
@@ -427,7 +427,7 @@ describe("PUT /users/", function () {
    *   statusCode: 422
    *
    */
-  it("respond with 422 malformed, because of missing lastName", function (done) {
+  it("respond with 422 malformed, because of too long lastName", function (done) {
     const data = {
       username: "CreationTest",
       password: "123456789",
