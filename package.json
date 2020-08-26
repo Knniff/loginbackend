@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node server.js",
     "start-dev": "nodemon -r dotenv/config server.js",
-    "test": "mocha"
+    "test": "nyc mocha"
   },
   "repository": {
     "type": "git",
