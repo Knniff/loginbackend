@@ -5,22 +5,76 @@ const Role = require("../_helpers/role");
 const ErrorHelper = require("../_helpers/error-helper");
 
 const { User } = db;
+const refreshTokens = [];
 
-// eslint-disable-next-line consistent-return
 async function login({ username, password }) {
   const user = await User.findOne({ username });
   if (user && bcrypt.compareSync(password, user.hash)) {
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { sub: user.id, role: user.role },
-      process.env.SECRET,
-      { expiresIn: "20d" },
+      process.env.ACCESSTOKENSECRET,
+      { expiresIn: "25m" },
     );
+    const refreshToken = jwt.sign(
+      { sub: user.id, role: user.role },
+      process.env.REFRESHTOKENSECRET,
+    );
+    refreshTokens.push(refreshToken);
     const { hash, ...userWithoutHash } = user.toObject();
     return {
       ...userWithoutHash,
-      token,
+      accessToken,
+      refreshToken,
     };
   }
+  throw new ErrorHelper(
+    "Unauthorized",
+    401,
+    "Username or Password is incorrect.",
+  );
+}
+
+async function logout(refreshToken) {
+  const index = refreshTokens.findIndex(
+    (element) => element === refreshToken,
+  );
+  refreshTokens.splice(index, 1);
+}
+
+async function tokenRefresh(refreshToken) {
+  if (!refreshTokens.includes(refreshToken)) {
+    throw new ErrorHelper(
+      "Unauthorized",
+      401,
+      "The refresh token is invalid.",
+    );
+  }
+
+  const tokens = jwt.verify(
+    refreshToken,
+    process.env.REFRESHTOKENSECRET,
+    (err, user) => {
+      if (err) {
+        throw new ErrorHelper(
+          "Unauthorized",
+          401,
+          "The refresh token is invalid.",
+        );
+      }
+
+      const accessToken = jwt.sign(
+        { sub: user.sub, role: user.role },
+        process.env.ACCESSTOKENSECRET,
+        { expiresIn: "25m" },
+      );
+
+      return {
+        accessToken,
+        refreshToken,
+      };
+    },
+  );
+  return tokens;
 }
 
 async function getAll() {
@@ -28,7 +82,15 @@ async function getAll() {
 }
 
 async function getById(id) {
-  return User.findById(id).select("-hash");
+  const user = await User.findById(id).select("-hash");
+  if (user) {
+    return user;
+  }
+  throw new ErrorHelper(
+    "Not Found",
+    404,
+    "Wrong ID or User deleted.",
+  );
 }
 
 async function create(userParam) {
@@ -56,12 +118,6 @@ async function create(userParam) {
 async function update(id, userParam) {
   const user = await User.findById(id);
   // validate
-  if (!user)
-    throw new ErrorHelper(
-      "Not Found",
-      404,
-      "Wrong ID or User deleted.",
-    );
   if (user.username !== userParam.username) {
     if (await User.findOne({ username: userParam.username })) {
       throw new ErrorHelper(
@@ -85,6 +141,8 @@ async function deleter(id) {
 
 module.exports = {
   login,
+  logout,
+  tokenRefresh,
   getAll,
   getById,
   create,
