@@ -1,10 +1,12 @@
-require("dotenv").config();
+// require("dotenv").config();
 const request = require("supertest");
 const app = require("../server");
 
 describe("GET /users", function () {
   let adminToken = null;
   let userToken = null;
+  let adminId = null;
+  let userId = null;
   beforeEach(async function () {
     const user = {
       username: "User",
@@ -18,14 +20,72 @@ describe("GET /users", function () {
       .post("/users/login")
       .send(admin)
       .then((response) => {
-        adminToken = response.body.token;
+        adminToken = response.body.accessToken;
+        adminId = response.body._id;
       });
     await request(app)
       .post("/users/login")
       .send(user)
       .then((response) => {
-        userToken = response.body.token;
+        userToken = response.body.accessToken;
+        userId = response.body._id;
       });
+  });
+  /*
+   *
+   *   Testing: Get admin with admin-token
+   *   statusCode: 200
+   *
+   */
+  it("respond with 200 ok, because admin can get himself", function (done) {
+    request(app)
+      .get(`/users/${adminId}`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .expect(200, done);
+  });
+  /*
+   *
+   *   Testing: Get user with user-token
+   *   statusCode: 200
+   *
+   */
+  it("respond with 200 ok, because user can get himself", function (done) {
+    request(app)
+      .get(`/users/${userId}`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(200, done);
+  });
+  /*
+   *
+   *   Testing: Get admin with user-token
+   *   statusCode: 403
+   *
+   */
+  it("respond with 401 unauthorized, because user cant get other users", function (done) {
+    request(app)
+      .get(`/users/${adminId}`)
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(
+        403,
+        {
+          Error: "Forbidden",
+          message:
+            "Forbidden for standard User, if its not your own account.",
+        },
+        done,
+      );
+  });
+  /*
+   *
+   *   Testing: Get user with admin-token
+   *   statusCode: 200
+   *
+   */
+  it("respond with 200 ok, because admins can get others", function (done) {
+    request(app)
+      .get(`/users/${userId}`)
+      .set("Authorization", `Bearer ${adminToken}`)
+      .expect(200, done);
   });
 
   /*
@@ -113,11 +173,11 @@ describe("GET /users", function () {
   });
   /*
    *
-   *   Testing: Get all without token
-   *   statusCode: 422
+   *   Testing: Get all with malformed token
+   *   statusCode: 401
    *
    */
-  it("respond with 422 unauthorized, because of malformed token", function (done) {
+  it("respond with 401 unauthorized, because of malformed token", function (done) {
     request(app)
       .get("/users")
       .set(
@@ -125,10 +185,10 @@ describe("GET /users", function () {
         "Bearer 1f56ew1afg68qerw1gf98erqw1gf98qer1g89qer1f89qeds1fg89qwer1fg98qwe1f89qw",
       )
       .expect(
-        422,
+        401,
         {
-          Error: "Unauthorized.",
-          message: "JWT malformed.",
+          Error: "Unauthorized",
+          message: "The token is invalid.",
         },
         done,
       );

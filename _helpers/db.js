@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const user = require("../users/user.model");
 const log = require("./logger");
 
-//activates debug statements for troubleshooting
-//mongoose.set("debug", true);
+// activates debug statements for troubleshooting
+// mongoose.set("debug", true);
 mongoose
   .connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
@@ -14,7 +14,7 @@ mongoose
     () => {
       log.logger.info("Database is connected");
     },
-    err => {
+    (err) => {
       log.logger.error(`Can not connect to the database${err}`);
     },
   );
@@ -23,7 +23,7 @@ mongoose.Promise = global.Promise;
 async function dropDB() {
   return mongoose.connection
     .dropCollection("users")
-    .catch(err => console.log(err));
+    .catch((err) => console.log(err));
 }
 
 module.exports = {

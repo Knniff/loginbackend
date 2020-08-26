@@ -1,4 +1,4 @@
-require("dotenv").config();
+// require("dotenv").config();
 const request = require("supertest");
 const app = require("../server");
 
@@ -137,7 +137,7 @@ describe("POST /users/login", function () {
       );
   });
   it("respond with 422 malformed, because of too long username", function (done) {
-    let data = {
+    const data = {
       username:
         "Usefwefwefgwefjuiwenfiuoawefnbzuiaeowhfiewzqghfrzuoagwerofzugewaqzurwaezuir",
       password: "123456789",

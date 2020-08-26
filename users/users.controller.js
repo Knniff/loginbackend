@@ -1,21 +1,21 @@
 const express = require("express");
-const expressJwt = require("express-jwt");
 const {
   loginValidationRules,
   registerValidationRules,
   updateValidationRules,
   checkId,
   checkToken,
+  checkRefreshToken,
   validate,
 } = require("../_helpers/validator");
 const userService = require("./user.service");
-const authorize = require("../_helpers/authorize");
+const { authorize, authenticate } = require("../_helpers/authorize");
 const ErrorHelper = require("../_helpers/error-helper");
 
 const router = express.Router();
 
 function userCheck(req) {
-  let currentUser = req.user;
+  const currentUser = req.user;
   currentUser.role = JSON.parse(currentUser.role);
   // only allow users with a rank higher then process.env.RANKCUTOFF to change/see other users
   if (
@@ -33,17 +33,7 @@ function userCheck(req) {
 function login(req, res, next) {
   userService
     .login(req.body)
-    .then((user) =>
-      user
-        ? res.json(user)
-        : next(
-            new ErrorHelper(
-              "Unauthorized",
-              401,
-              "Username or Password is incorrect.",
-            ),
-          ),
-    )
+    .then((user) => res.json(user))
     .catch((err) => next(err));
 }
 
@@ -54,6 +44,20 @@ function register(req, res, next) {
     .catch((err) => next(err));
 }
 
+function logout(req, res, next) {
+  userService
+    .logout(req.body.refreshToken)
+    .then(() => res.json({}))
+    .catch((err) => next(err));
+}
+
+function tokenRefresh(req, res, next) {
+  userService
+    .tokenRefresh(req.body.refreshToken)
+    .then((token) => res.json(token))
+    .catch((err) => next(err));
+}
+
 function getAll(req, res, next) {
   userService
     .getAll()
@@ -61,23 +65,11 @@ function getAll(req, res, next) {
     .catch((err) => next(err));
 }
 
-// eslint-disable-next-line consistent-return
 function getById(req, res, next) {
   userCheck(req);
-
   userService
     .getById(req.params.id)
-    .then((user) =>
-      user
-        ? res.json(user)
-        : next(
-            new ErrorHelper(
-              "Not Found",
-              404,
-              "Wrong ID or User deleted.",
-            ),
-          ),
-    )
+    .then((user) => res.json(user))
     .catch((err) => next(err));
 }
 
@@ -100,36 +92,41 @@ function deleter(req, res, next) {
 }
 
 // routes
-router.post("/login", loginValidationRules(), validate, login); // public routes
+// public routes
+router.post("/login", loginValidationRules(), validate, login);
 router.post(
   "/register",
   registerValidationRules(),
   validate,
   register,
 );
+router.post("/logout", checkRefreshToken(), validate, logout);
+router.post("/refresh", checkRefreshToken(), validate, tokenRefresh);
+// admin only
 router.get(
   "/",
   checkToken(),
   validate,
-  expressJwt({ secret: process.env.SECRET }),
+  authenticate,
   authorize(100),
   getAll,
-); // admin only
+);
+// all logged in users
 router.get(
   "/:id",
   checkToken(),
   checkId(),
   validate,
-  expressJwt({ secret: process.env.SECRET }),
+  authenticate,
   authorize(),
   getById,
-); // all logged in users
+);
 router.put(
   "/:id",
   checkToken(),
   updateValidationRules(),
   validate,
-  expressJwt({ secret: process.env.SECRET }),
+  authenticate,
   authorize(),
   update,
 );
@@ -138,7 +135,7 @@ router.delete(
   checkToken(),
   checkId(),
   validate,
-  expressJwt({ secret: process.env.SECRET }),
+  authenticate,
   authorize(),
   deleter,
 );
