@@ -20,7 +20,7 @@ function userCheck(req) {
   // only allow users with a rank higher then process.env.RANKCUTOFF to change/see other users
   if (
     req.params.id !== currentUser.sub &&
-    currentUser.role.rank <= Number(process.env.RANKCUTOFF)
+    currentUser.role.rank < Number(process.env.RANKCUTOFF)
   ) {
     throw new ErrorHelper(
       "Forbidden",
