@@ -56,7 +56,7 @@ describe("POST /users/login", function () {
       );
   });
 
-  it("respond with 422 ok, because of no password given", function (done) {
+  /*   it("respond with 422 ok, because of no password given", function (done) {
     let data = {
       username: "User",
     };
@@ -105,7 +105,7 @@ describe("POST /users/login", function () {
         },
         done,
       );
-  });
+  }); */
   it("respond with 422 malformed, because of too short password", function (done) {
     let data = {
       username: "User",

@@ -9,6 +9,8 @@ const schema = new Schema({
   lastName: { type: String, required: true },
   createdDate: { type: Date, default: Date.now },
   role: { type: String, required: true },
+  mfaEnabled: { type: Boolean, default: false },
+  mfaSecret: { type: String, required: false },
 });
 
 schema.set("toJSON", { virtuals: true });

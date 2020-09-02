@@ -34,11 +34,13 @@
     "express-pino-logger": "^4.0.0",
     "express-validator": "^6.6.1",
     "helmet": "^3.23.3",
+    "hi-base32": "^0.5.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.0",
     "mongoose": "^5.10.0",
     "pino": "^5.17.0",
     "pino-elasticsearch": "^4.4.1",
+    "qrcode": "^1.4.4",
     "rootpath": "^0.1.2",
     "teemojs": "^1.5.0"
   },

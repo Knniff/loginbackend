@@ -1,28 +1,48 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const qrcode = require("qrcode");
 const db = require("../_helpers/db");
 const Role = require("../_helpers/role");
 const ErrorHelper = require("../_helpers/error-helper");
+const mfa = require("../_helpers/mfa");
 
 const { User } = db;
 const refreshTokens = [];
+// const blacklistedRefreshTokens = [];
 
 async function login({ username, password }) {
   const user = await User.findOne({ username });
   if (user && bcrypt.compareSync(password, user.hash)) {
+    if (user.mfaEnabled) {
+      const refreshToken = jwt.sign(
+        {
+          sub: user.id,
+          role: user.role,
+        },
+        process.env.REFRESHTOKENSECRET,
+      );
+      return { refreshToken };
+    }
     const accessToken = jwt.sign(
       { sub: user.id, role: user.role },
       process.env.ACCESSTOKENSECRET,
       { expiresIn: "25m" },
     );
     const refreshToken = jwt.sign(
-      { sub: user.id, role: user.role },
+      {
+        sub: user.id,
+        role: user.role,
+      },
       process.env.REFRESHTOKENSECRET,
     );
     refreshTokens.push(refreshToken);
-    const { hash, ...userWithoutHash } = user.toObject();
+    const {
+      hash,
+      mfaSecret,
+      ...userWithoutSecrets
+    } = user.toObject();
     return {
-      ...userWithoutHash,
+      ...userWithoutSecrets,
       accessToken,
       refreshToken,
     };
@@ -32,6 +52,90 @@ async function login({ username, password }) {
     401,
     "Username or Password is incorrect.",
   );
+}
+
+async function verifyMfaToken(refreshToken, totp) {
+  if (refreshTokens.includes(refreshToken)) {
+    throw new ErrorHelper("Not Needed", 200, "Already Logged in.");
+  }
+  const tokenData = jwt.verify(
+    refreshToken,
+    process.env.REFRESHTOKENSECRET,
+    (err, data) => {
+      if (err) {
+        throw new ErrorHelper(
+          "Unauthorized",
+          401,
+          "The refresh token is invalid.",
+        );
+      }
+      return {
+        data,
+      };
+    },
+  );
+  const user = await User.findById(tokenData.data.sub);
+  const authenticated = mfa.verifyTOTP(
+    totp,
+    user.mfaSecret,
+    process.env.MFAWINDOW,
+  );
+  if (authenticated) {
+    refreshTokens.push(refreshToken);
+    const accessToken = jwt.sign(
+      { sub: user.id, role: user.role },
+      process.env.ACCESSTOKENSECRET,
+      { expiresIn: "25m" },
+    );
+    const {
+      hash,
+      mfaSecret,
+      ...userWithoutSecrets
+    } = user.toObject();
+    return { ...userWithoutSecrets, accessToken, refreshToken };
+  }
+  throw new ErrorHelper(
+    "Unauthorized",
+    401,
+    "TOTP Token is incorrect.",
+  );
+}
+
+async function generateMfa(id) {
+  const user = await User.findById(id);
+  const userSecret = mfa.generateSecret(process.env.MFASECRETLENGTH);
+  user.mfaSecret = userSecret;
+  const otpauthurl = `otpauth://totp/LoginBackend:${user.username}?secret=${userSecret}`;
+  const dataurl = await qrcode.toDataURL(otpauthurl);
+  await user.save();
+  return { userSecret, dataurl };
+}
+
+async function enableMfa(id, totp) {
+  const user = await User.findById(id);
+  const authenticated = mfa.verifyTOTP(
+    totp,
+    user.mfaSecret,
+    process.env.MFAWINDOW,
+  );
+  if (authenticated) {
+    user.mfaEnabled = true;
+    await user.save();
+  } else {
+    user.mfaSecret = "";
+    throw new ErrorHelper(
+      "Unauthorized",
+      401,
+      "TOTP Token is incorrect. Mfa Activation process exited.",
+    );
+  }
+}
+
+async function disableMfa(id) {
+  const user = await User.findById(id);
+  user.mfaSecret = "";
+  user.mfaEnabled = false;
+  await user.save();
 }
 
 async function logout(refreshToken) {
@@ -111,7 +215,6 @@ async function create(userParam) {
   if (userParam.password) {
     user.hash = bcrypt.hashSync(userParam.password, 10);
   }
-
   await user.save();
 }
 
@@ -141,6 +244,10 @@ async function deleter(id) {
 
 module.exports = {
   login,
+  verifyMfaToken,
+  generateMfa,
+  enableMfa,
+  disableMfa,
   logout,
   tokenRefresh,
   getAll,

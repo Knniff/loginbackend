@@ -37,6 +37,34 @@ function login(req, res, next) {
     .catch((err) => next(err));
 }
 
+function verifyMfaToken(req, res, next) {
+  userService
+    .verifyMfaToken(req.body.refreshToken, req.body.totp)
+    .then((user) => res.json(user))
+    .catch((err) => next(err));
+}
+
+function generateMfa(req, res, next) {
+  userService
+    .generateMfa(req.user.sub)
+    .then((secret) => res.json(secret))
+    .catch((err) => next(err));
+}
+
+function enableMfa(req, res, next) {
+  userService
+    .enableMfa(req.user.sub, req.body.token)
+    .then(() => res.json({}))
+    .catch((err) => next(err));
+}
+
+function disableMfa(req, res, next) {
+  userService
+    .disableMfa(req.user.sub)
+    .then(() => res.json({}))
+    .catch((err) => next(err));
+}
+
 function register(req, res, next) {
   userService
     .create(req.body)
@@ -95,6 +123,12 @@ function deleter(req, res, next) {
 // public routes
 router.post("/login", loginValidationRules(), validate, login);
 router.post(
+  "/mfa/verify",
+  checkRefreshToken(),
+  validate,
+  verifyMfaToken,
+);
+router.post(
   "/register",
   registerValidationRules(),
   validate,
@@ -112,6 +146,30 @@ router.get(
   getAll,
 );
 // all logged in users
+router.post(
+  "/mfa/generate",
+  checkToken(),
+  validate,
+  authenticate,
+  authorize(),
+  generateMfa,
+);
+router.post(
+  "/mfa/enable",
+  checkToken(),
+  validate,
+  authenticate,
+  authorize(),
+  enableMfa,
+);
+router.post(
+  "/mfa/disable",
+  checkToken(),
+  validate,
+  authenticate,
+  authorize(),
+  disableMfa,
+);
 router.get(
   "/:id",
   checkToken(),
