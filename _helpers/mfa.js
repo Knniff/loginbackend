@@ -57,10 +57,12 @@ function verifyTOTP(token, secret, window) {
     errorWindow <= +window;
     errorWindow += 1
   ) {
-    const totp = generateTOTP(secret, errorWindow);
+    const totp = generateTOTP(secret, errorWindow)
+      .toString()
+      .padStart(6, "0");
     const isValid = crypto.timingSafeEqual(
       buffer,
-      Buffer.from(Buffer.from(totp.toString())),
+      Buffer.from(Buffer.from(totp)),
     );
     if (isValid) {
       return true;
