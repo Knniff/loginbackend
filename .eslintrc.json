@@ -10,9 +10,10 @@
     "airbnb-base",
     "prettier",
     "plugin:security/recommended",
-    "plugin:node/recommended"
+    "plugin:node/recommended",
+    "plugin:mocha/recommended"
   ],
-  "plugins": ["prettier", "security"],
+  "plugins": ["prettier", "security", "mocha"],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"

@@ -25,7 +25,7 @@ function userCheck(req) {
     throw new ErrorHelper(
       "Forbidden",
       403,
-      "Forbidden for standard User, if its not your own account.",
+      "Forbidden for your rank, if its not your own account.",
     );
   }
 }

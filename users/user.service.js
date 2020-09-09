@@ -142,6 +142,13 @@ async function logout(refreshToken) {
   const index = refreshTokens.findIndex(
     (element) => element === refreshToken,
   );
+  if (index === -1) {
+    throw new ErrorHelper(
+      "Unauthorized",
+      401,
+      "The refresh token is invalid.",
+    );
+  }
   refreshTokens.splice(index, 1);
 }
 

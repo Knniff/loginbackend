@@ -5,7 +5,7 @@ const { generateTOTP } = require("../_helpers/mfa");
 
 describe("POST /users/mfa", function () {
   let userToken = null;
-  before(async function () {
+  beforeEach(async function () {
     const user = {
       username: "User",
       password: "123456789",
