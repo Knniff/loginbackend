@@ -40,7 +40,9 @@ function generateHOTP(secret, counter) {
 
 function generateTOTP(secret, window = 0) {
   const counter = Math.floor(Date.now() / 30000);
-  return generateHOTP(secret, counter + window);
+  return generateHOTP(secret, counter + window)
+    .toString()
+    .padStart(6, "0");
 }
 
 function verifyTOTP(token, secret, window) {
@@ -57,9 +59,7 @@ function verifyTOTP(token, secret, window) {
     errorWindow <= +window;
     errorWindow += 1
   ) {
-    const totp = generateTOTP(secret, errorWindow)
-      .toString()
-      .padStart(6, "0");
+    const totp = generateTOTP(secret, errorWindow);
     const isValid = crypto.timingSafeEqual(
       buffer,
       Buffer.from(Buffer.from(totp)),

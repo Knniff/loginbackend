@@ -23,7 +23,7 @@ mongoose.Promise = global.Promise;
 async function dropDB() {
   return mongoose.connection
     .dropCollection("users")
-    .catch((err) => console.log("No Collection to be dropped"));
+    .catch(() => console.log("No Collection to be dropped"));
 }
 
 module.exports = {
