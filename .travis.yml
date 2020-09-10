@@ -6,10 +6,10 @@ cache:
     - "node_modules"
 env:
   global:
-    - ACCESSTOKENSECRET = "Your random key - its just string, you could even use this.1"
-    - REFRESHTOKENSECRET = "Your random key - its just string, you could even use this.2"
-    - MFATOKENSECRET = "Your random key - its just string, you could even use this.3"
-    - PORT = 4000
-    - RANKCUTOFF = 79
-    - MFAWINDOW = 2
-    - MFASECRETLENGTH = 20
+    - ACCESSTOKENSECRET="Your random key - its just string, you could even use this.1"
+    - REFRESHTOKENSECRET="Your random key - its just string, you could even use this.2"
+    - MFATOKENSECRET="Your random key - its just string, you could even use this.3"
+    - PORT=4000
+    - RANKCUTOFF=79
+    - MFAWINDOW=2
+    - MFASECRETLENGTH=20
