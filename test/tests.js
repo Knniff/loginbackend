@@ -5,7 +5,7 @@ require("dotenv").config();
 const request = require("supertest");
 const bcrypt = require("bcryptjs");
 const Role = require("../_helpers/role");
-const { dropDB, User } = require("../_helpers/db");
+const { dropDB, closeConnection, User } = require("../_helpers/db");
 const app = require("../server");
 const { generateTOTP } = require("../_helpers/mfa");
 
@@ -60,6 +60,10 @@ describe("/users", function () {
 
   before(async function () {
     await dropDB();
+  });
+  after(async function () {
+    app.close();
+    await closeConnection();
   });
   describe("POST /refresh", function () {
     describe("Successes", function () {
@@ -188,11 +192,17 @@ describe("/users", function () {
         const generateSecret = await request(app)
           .post("/users/mfa/generate")
           .set("Authorization", `Bearer ${user.body.accessToken}`);
-        const totp = generateTOTP(generateSecret.body.userSecret, 0);
+        const generatedTotp = generateTOTP(
+          generateSecret.body.userSecret,
+          0,
+        );
         await request(app)
           .post("/users/mfa/enable")
           .set("Authorization", `Bearer ${user.body.accessToken}`)
-          .send({ token: totp });
+          .send({ token: generatedTotp });
+        await request(app)
+          .post("/users/logout")
+          .send({ refreshToken: user.body.refreshToken });
         const loginResponse = await request(app)
           .post("/users/login")
           .send(userLoginData);
@@ -934,7 +944,6 @@ describe("/users", function () {
           .set("Authorization", `Bearer ${admin.body.accessToken}`)
           .expect(200);
       });
-
       it("respond with 200 ok, because he is allowed to delete himself", async function () {
         await createUser();
         const user = await login(userLoginData);
