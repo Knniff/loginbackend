@@ -36,13 +36,13 @@
     "helmet": "^3.23.3",
     "hi-base32": "^0.5.0",
     "jsonwebtoken": "^8.5.1",
-    "mongodb": "^3.6.0",
-    "mongoose": "^5.10.0",
+    "mongodb": "^3.6.1",
+    "mongoose": "^5.10.4",
     "pino": "^5.17.0",
     "pino-elasticsearch": "^4.4.1",
     "qrcode": "^1.4.4",
     "rootpath": "^0.1.2",
-    "teemojs": "^1.5.0"
+    "teemojs": "^1.5.3"
   },
   "devDependencies": {
     "@types/jest": "^25.2.3",
@@ -60,7 +60,7 @@
     "nodemon": "^2.0.4",
     "nyc": "^15.1.0",
     "pino-pretty": "^3.6.1",
-    "prettier": "^2.0.5",
+    "prettier": "^2.1.1",
     "supertest": "^4.0.2"
   }
 }
