@@ -4,6 +4,7 @@ node_js:
 cache:
   directories:
     - "node_modules"
+after_success: npm run coverage
 env:
   global:
     - ACCESSTOKENSECRET="Your random key - its just string, you could even use this.1"

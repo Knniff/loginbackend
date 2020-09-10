@@ -25,8 +25,12 @@ async function dropDB() {
     .dropCollection("users")
     .catch(() => console.log("No Collection to be dropped"));
 }
+async function closeConnection() {
+  return mongoose.connection.close().catch((err) => console.log(err));
+}
 
 module.exports = {
   User: user,
   dropDB,
+  closeConnection,
 };

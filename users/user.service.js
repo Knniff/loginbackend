@@ -120,22 +120,21 @@ async function enableMfa(id, totp) {
   );
   if (authenticated) {
     user.mfaEnabled = true;
-    await user.save();
-  } else {
-    user.mfaSecret = "";
-    throw new ErrorHelper(
-      "Unauthorized",
-      401,
-      "TOTP Token is incorrect. Mfa Activation process exited.",
-    );
+    return user.save();
   }
+  user.mfaSecret = "";
+  throw new ErrorHelper(
+    "Unauthorized",
+    401,
+    "TOTP Token is incorrect. Mfa Activation process exited.",
+  );
 }
 
 async function disableMfa(id) {
   const user = await User.findById(id);
   user.mfaSecret = "";
   user.mfaEnabled = false;
-  await user.save();
+  return user.save();
 }
 
 async function logout(refreshToken) {
@@ -222,7 +221,7 @@ async function create(userParam) {
   if (userParam.password) {
     user.hash = bcrypt.hashSync(userParam.password, 10);
   }
-  await user.save();
+  return user.save();
 }
 
 async function update(id, userParam) {
@@ -242,11 +241,11 @@ async function update(id, userParam) {
 
   // copy userParam properties to user
   Object.assign(user, userParam);
-  await user.save();
+  return user.save();
 }
 
 async function deleter(id) {
-  await User.findByIdAndDelete(id);
+  return User.findByIdAndDelete(id);
 }
 
 module.exports = {
