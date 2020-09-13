@@ -1,11 +1,11 @@
 {
-  "name": "leaguebackend",
+  "name": "loginbackend",
   "version": "1.0.0",
   "type": "commonjs",
   "engines": {
     "node": ">=8.10.0"
   },
-  "description": "Backend for Riot-APIs. Gets data from Riot-APIs, processes it and saves it to a database for later use in a frontend webpage. Built with Express.",
+  "description": "A simple backend with a JWT-Token based login system to be used as a base for bigger projects.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -15,18 +15,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Knniff/leaguebackend.git"
+    "url": "git+https://github.com/Knniff/loginbackend.git"
   },
   "keywords": [
-    "league",
+    "login",
     "backend"
   ],
   "author": "Knniff",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Knniff/leaguebackend/issues"
+    "url": "https://github.com/Knniff/loginbackend/issues"
   },
-  "homepage": "https://github.com/Knniff/leaguebackend#readme",
+  "homepage": "https://github.com/Knniff/loginbackend#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
