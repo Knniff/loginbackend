@@ -157,9 +157,10 @@ describe("/users", function () {
           .post("/users/mfa/enable")
           .set("Authorization", `Bearer ${user.body.accessToken}`)
           .send({ token: totp });
-        const loginResponse = await request(app)
-          .post("/users/login")
-          .send(userLoginData);
+        await request(app)
+          .post("/users/logout")
+          .send({ refreshToken: user.body.refreshToken });
+        const loginResponse = await login(userLoginData);
         await request(app)
           .post("/users/mfa/verify")
           .send({
@@ -203,9 +204,7 @@ describe("/users", function () {
         await request(app)
           .post("/users/logout")
           .send({ refreshToken: user.body.refreshToken });
-        const loginResponse = await request(app)
-          .post("/users/login")
-          .send(userLoginData);
+        const loginResponse = await login(userLoginData);
         await request(app)
           .post("/users/mfa/verify")
           .send({
