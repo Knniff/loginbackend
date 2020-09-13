@@ -42,11 +42,9 @@
     "pino": "^5.17.0",
     "pino-elasticsearch": "^4.4.1",
     "qrcode": "^1.4.4",
-    "rootpath": "^0.1.2",
-    "teemojs": "^1.5.3"
+    "rootpath": "^0.1.2"
   },
   "devDependencies": {
-    "@types/jest": "^25.2.3",
     "babel-eslint": "^10.1.0",
     "coveralls": "^3.1.0",
     "dotenv": "^8.2.0",
