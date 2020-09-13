@@ -246,8 +246,13 @@ async function update(id, userParam) {
 
 async function deleter(id) {
   const user = await User.findByIdAndDelete(id);
-  console.log(user);
-  return user;
+  if (user === null) {
+    throw new ErrorHelper(
+      "Not Found",
+      404,
+      "Wrong ID or User deleted.",
+    );
+  }
 }
 
 module.exports = {
