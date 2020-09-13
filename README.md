@@ -1,5 +1,5 @@
-CI: [![Build Status](https://travis-ci.org/Knniff/loginbackend.svg?branch=master)](https://travis-ci.org/Knniff/loginbackend)
-Coverage: [![Coverage Status](https://coveralls.io/repos/github/Knniff/loginbackend/badge.svg?branch=master)](https://coveralls.io/github/Knniff/loginbackend?branch=master)
+[![Build Status](https://travis-ci.org/Knniff/loginbackend.svg?branch=master)](https://travis-ci.org/Knniff/loginbackend)
+ [![Coverage Status](https://coveralls.io/repos/github/Knniff/loginbackend/badge.svg?branch=master)](https://coveralls.io/github/Knniff/loginbackend?branch=master) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # leaguebackend
 
