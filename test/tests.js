@@ -520,10 +520,11 @@ describe("/users", function () {
           firstName: "Peter",
           lastName: "Mustermann",
         };
-        await createAdmin();
-        await createUser();
-        const user = await login(userLoginData);
-        const admin = await login(adminLoginData);
+        await Promise.all([createUser(), createAdmin()]);
+        const [user, admin] = await Promise.all([
+          login(userLoginData),
+          login(adminLoginData),
+        ]);
         await request(app)
           .put(`/users/${user.body._id}`)
           .set("Authorization", `Bearer ${admin.body.accessToken}`)
@@ -558,10 +559,11 @@ describe("/users", function () {
           firstName: "Max",
           lastName: "Mustermann",
         };
-        await createAdmin();
-        await createUser();
-        const user = await login(userLoginData);
-        const admin = await login(adminLoginData);
+        await Promise.all([createUser(), createAdmin()]);
+        const [user, admin] = await Promise.all([
+          login(userLoginData),
+          login(adminLoginData),
+        ]);
         await request(app)
           .put(`/users/${admin.body._id}`)
           .set("Authorization", `Bearer ${user.body.accessToken}`)
@@ -837,10 +839,11 @@ describe("/users", function () {
           .expect(200);
       });
       it("respond with 200 ok, because admins can get others", async function () {
-        await createAdmin();
-        await createUser();
-        const user = await login(userLoginData);
-        const admin = await login(adminLoginData);
+        await Promise.all([createUser(), createAdmin()]);
+        const [user, admin] = await Promise.all([
+          login(userLoginData),
+          login(adminLoginData),
+        ]);
         await request(app)
           .get(`/users/${user.body._id}`)
           .set("Authorization", `Bearer ${admin.body.accessToken}`)
@@ -858,10 +861,11 @@ describe("/users", function () {
     });
     describe("Errors", function () {
       it("respond with 401 unauthorized, because user cant get other users", async function () {
-        await createAdmin();
-        await createUser();
-        const user = await login(userLoginData);
-        const admin = await login(adminLoginData);
+        await Promise.all([createUser(), createAdmin()]);
+        const [user, admin] = await Promise.all([
+          login(userLoginData),
+          login(adminLoginData),
+        ]);
         await request(app)
           .get(`/users/${admin.body._id}`)
           .set("Authorization", `Bearer ${user.body.accessToken}`)
@@ -942,10 +946,11 @@ describe("/users", function () {
           .expect(200);
       });
       it("respond with 200 ok, because admins are allowed to delete all users", async function () {
-        await createAdmin();
-        await createUser();
-        const user = await login(userLoginData);
-        const admin = await login(adminLoginData);
+        await Promise.all([createUser(), createAdmin()]);
+        const [user, admin] = await Promise.all([
+          login(userLoginData),
+          login(adminLoginData),
+        ]);
         await request(app)
           .delete(`/users/${user.body._id}`)
           .set("Authorization", `Bearer ${admin.body.accessToken}`)
@@ -955,14 +960,14 @@ describe("/users", function () {
 
     describe("Errors", function () {
       it("respond with 403 forbidden, because a standard user cant delete other users", async function () {
-        await createUser();
-        const responseBody = await login(userLoginData);
+        await Promise.all([createUser(), createAdmin()]);
+        const [user, admin] = await Promise.all([
+          login(userLoginData),
+          login(adminLoginData),
+        ]);
         await request(app)
-          .delete("/users/0000000000006204aefc242c")
-          .set(
-            "Authorization",
-            `Bearer ${responseBody.body.accessToken}`,
-          )
+          .delete(`/users/${admin.body._id}`)
+          .set("Authorization", `Bearer ${user.body.accessToken}`)
           .expect(403, {
             Error: "Forbidden",
             message:
